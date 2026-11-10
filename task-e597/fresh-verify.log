@@ -1,0 +1,350 @@
+# host: validator-host  date: 2026-11-10T10:40:37Z
+# OS: Ubuntu 22.04.5 LTS
+# workdir: <scratch>/e597-fresh-yHKy
+$ git clone -q https://github.com/postfiatorg/postfiatl1v2.git src
+(exit 0)
+$ git log -1 --format='%H %ad %s' --date=iso-strict origin/main
+5c8f693ca1d1603da1fde07cbcd82463b8ad92a7 2026-11-10T10:38:43+00:00 Add the release plan row for the verify_bridge fix
+(exit 0)
+$ git merge-base --is-ancestor edc70f7b178e2389d7af122d6f254a92364777f2 ab2150253ff80eca5d0c5eda8b0814c4f5dc5e1a && echo 'PR head edc70f7b is in merge ab2150253'
+PR head edc70f7b is in merge ab2150253
+(exit 0)
+$ git merge-base --is-ancestor ab2150253ff80eca5d0c5eda8b0814c4f5dc5e1a origin/main && echo 'merge ab2150253 is an ancestor of origin/main'
+merge ab2150253 is an ancestor of origin/main
+(exit 0)
+$ git log -1 --format='%H author=%an committer=%cn %ad' --date=iso-strict edc70f7b178e2389d7af122d6f254a92364777f2
+edc70f7b178e2389d7af122d6f254a92364777f2 author=darkmatter-sudo committer=darkmatter-sudo 2026-11-09T21:53:18+00:00
+(exit 0)
+$ git show --stat --format='%H %s' edc70f7b178e2389d7af122d6f254a92364777f2 | tail -9
+
+ crates/privacy_orchard/src/asset_orchard.rs        | 214 ++++++++++++-----
+ .../src/asset_orchard_action_builders.rs           | 262 +++++++++++++++++----
+ .../privacy_orchard/src/asset_orchard_circuit.rs   |  87 ++++---
+ .../src/asset_orchard_circuit_tests.rs             |  85 ++++---
+ .../src/asset_orchard_sinsemilla.rs                |  12 +-
+ crates/privacy_orchard/src/lib.rs                  |   9 +-
+ crates/privacy_orchard/src/verify.rs               |  90 ++++++-
+ 7 files changed, 571 insertions(+), 188 deletions(-)
+(exit 0)
+$ git diff --stat edc70f7b178e2389d7af122d6f254a92364777f2^ edc70f7b178e2389d7af122d6f254a92364777f2
+ crates/privacy_orchard/src/asset_orchard.rs        | 214 ++++++++++++-----
+ .../src/asset_orchard_action_builders.rs           | 262 +++++++++++++++++----
+ .../privacy_orchard/src/asset_orchard_circuit.rs   |  87 ++++---
+ .../src/asset_orchard_circuit_tests.rs             |  85 ++++---
+ .../src/asset_orchard_sinsemilla.rs                |  12 +-
+ crates/privacy_orchard/src/lib.rs                  |   9 +-
+ crates/privacy_orchard/src/verify.rs               |  90 ++++++-
+ 7 files changed, 571 insertions(+), 188 deletions(-)
+(exit 0)
+$ git diff --quiet edc70f7b178e2389d7af122d6f254a92364777f2 ab2150253ff80eca5d0c5eda8b0814c4f5dc5e1a -- crates/privacy_orchard && echo 'privacy_orchard identical at PR head and merge commit'
+privacy_orchard identical at PR head and merge commit
+(exit 0)
+$ git checkout -q ab2150253ff80eca5d0c5eda8b0814c4f5dc5e1a && git rev-parse HEAD
+ab2150253ff80eca5d0c5eda8b0814c4f5dc5e1a
+(exit 0)
+$ sha256sum crates/privacy_orchard/src/asset_orchard_action_builders.rs crates/privacy_orchard/src/verify.rs crates/privacy_orchard/src/asset_orchard.rs Cargo.lock
+7e432f3e8d44ac8e036b3e14f47f11adad38ee72df8e1541ffb4686977955922  crates/privacy_orchard/src/asset_orchard_action_builders.rs
+bc03cf20ed7721a58720ce0645e58ea9baa23aae28c8ce7be4292853d524367c  crates/privacy_orchard/src/verify.rs
+e86e8e031d042a39fb9357175a4fff6b6796f9e00d98f87bd4ffb35471890b1e  crates/privacy_orchard/src/asset_orchard.rs
+ea196895ad7aee3020cb9b9a6ad079aa1976abcff35a8c4710116d3e44a4e2a0  Cargo.lock
+(exit 0)
+$ docker run --rm --cpus 2 -v <clone>:/src -w /src rust:1.95.0-bookworm cargo test -p postfiat-privacy-orchard --locked   # merge commit ab2150253 (PR #201 as merged)
+info: syncing channel updates for 1.95.0-x86_64-unknown-linux-gnu
+info: latest update on 2026-04-16 for version 1.95.0 (59807616e 2026-04-14)
+info: downloading component clippy
+    Updating crates.io index
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3m 57s
+     Running unittests src/lib.rs (target/debug/deps/postfiat_privacy_orchard-438b27d74e6c1821)
+
+running 120 tests
+test asset_orchard::tests::asset_note_message_segments_reconstruct_host_message_bits ... ok
+test asset_orchard::tests::asset_nullifier_and_output_rho_are_domain_separated ... ok
+test asset_orchard::tests::asset_note_commitment_binds_pool_asset_value_and_points ... ok
+test asset_orchard::tests::asset_orchard_action_rejects_duplicate_public_state_fields ... ok
+test asset_orchard::tests::asset_orchard_action_rejects_tampered_binding_and_wrong_domain ... ok
+test asset_orchard::tests::asset_orchard_action_validates_and_constructs_public_instance ... ok
+test asset_orchard::tests::asset_orchard_indexing_helpers_reject_count_mismatch_without_panic ... ok
+test asset_orchard::tests::asset_orchard_wrappers_reject_noncanonical_encodings ... ok
+test asset_orchard::tests::asset_tag_uses_first_256_bits_and_rejects_noncanonical_text ... ok
+test asset_orchard::tests::asset_orchard_spend_authorizations_verify_and_bind_h_sig ... ok
+test asset_orchard::tests::disclosed_egress_randomizer_uses_fresh_randomness ... ok
+test asset_orchard::tests::encrypted_output_hash_returns_three_128_bit_limbs ... ok
+test asset_orchard::tests::h_action_and_swap_binding_hash_are_consistent ... ok
+test asset_orchard::tests::disclosed_egress_authorization_verifies_and_binds_recipient ... ok
+test asset_orchard::tests::hash_to_pallas_base_is_deterministic_and_domain_separated ... ok
+test asset_orchard::tests::hash_to_pallas_scalar_rejects_zero_by_construction ... ok
+test asset_orchard::tests::note_opening_and_wallet_note_debug_redact_custody_fields ... ok
+test asset_orchard::tests::h_sig_binds_raw_ciphertext_and_binding_hash ... ok
+test asset_orchard::tests::note_opening_and_wallet_note_serde_wire_format_is_pinned ... ok
+test asset_orchard::tests::orchard_psi_and_rcm_bind_rseed_and_rho ... ok
+test asset_orchard::tests::pool_domain_binds_chain_genesis_protocol_pool_and_note_version ... ok
+test asset_orchard::tests::note_opening_zeroize_used_by_drop_clears_every_custody_field ... ok
+test asset_orchard::tests::private_primary_issue_requires_exact_output_value_asset_and_domain ... ok
+test asset_orchard::tests::private_egress_action_serialization_does_not_disclose_note_opening ... ok
+test asset_orchard::tests::private_primary_redeem_schema_selects_settlement_output_semantics ... ok
+test asset_orchard::tests::swap_accounting_serialization_hides_asset_identity ... ok
+test asset_orchard_circuit::secret_lifetime_tests::secret_value_wipes_curve_values_per_owner_and_redacts_debug ... ok
+test asset_orchard_circuit::secret_lifetime_tests::note_opening_zeroize_used_by_drop_clears_every_field ... ok
+test asset_orchard_circuit::secret_lifetime_tests::spend_key_and_rivk_parse_errors_keep_codes_on_every_exit ... ok
+test asset_orchard_circuit::secret_lifetime_tests::swap_witness_and_spend_authority_debug_redact_secrets ... ok
+test asset_orchard_circuit::secret_lifetime_tests::swap_witness_holds_unchanged_values_in_self_wiping_owners ... ok
+test asset_orchard_circuit::secret_lifetime_tests::swap_builder_borrows_zeroizing_output_seeds_and_keeps_error_codes ... ok
+test asset_orchard_circuit::tests::conservation_core_accepts_pairwise_private_swap ... ok
+test asset_orchard_circuit::tests::conservation_core_accepts_single_nonzero_asset_tag_limb ... ok
+test asset_orchard_circuit::tests::conservation_core_accepts_uniform_private_swap_selectors ... ok
+test asset_orchard_circuit::tests::conservation_core_rejects_duplicate_public_nullifiers_and_outputs ... ok
+test asset_orchard_circuit::tests::conservation_core_rejects_forged_action_context ... ok
+test asset_orchard_circuit::tests::conservation_core_real_halo2_proof_verifies_and_binds_instance has been running for over 60 seconds
+test asset_orchard_circuit::tests::conservation_core_rejects_forged_nonconserving_swap ... ok
+test asset_orchard_circuit::tests::conservation_core_rejects_nonzero_fee_public_instance ... ok
+test asset_orchard_circuit::tests::conservation_core_rejects_split_private_swap_selectors ... ok
+test asset_orchard_circuit::tests::conservation_core_rejects_zero_asset_tag_witness ... ok
+test asset_orchard_circuit::tests::conservation_core_rejects_zero_value_witness ... ok
+test asset_orchard_circuit::tests::current_and_replay_vk_identities_are_distinct_and_exactly_pinned ... ok
+test asset_orchard_circuit::tests::embedded_k15_params_artifact_loads_exactly ... ok
+test asset_orchard_circuit::tests::k15_params_artifact_rejects_wrong_length_k_and_hash ... ok
+test asset_orchard_circuit::tests::pow5_chip_matches_reference_poseidon_for_randomized_action_vectors has been running for over 60 seconds
+test asset_orchard_circuit::tests::pow5_chip_matches_reference_poseidon_for_randomized_action_vectors ... ok
+test asset_orchard_circuit::tests::pricing_binding_accepts_deterministic_floor_rounding ... ok
+test asset_orchard_circuit::tests::pricing_binding_accepts_pfusdc_to_pnok_demo_fix_exactly ... ok
+test asset_orchard_circuit::tests::pricing_binding_rejects_forged_ratio_for_private_amounts ... ok
+test asset_orchard_circuit::tests::pricing_binding_rejects_non_floor_rounded_private_value ... ok
+test asset_orchard_circuit::tests::pricing_binding_rejects_one_atom_pnok_demo_fix_deviation ... ok
+test asset_orchard_circuit::tests::pricing_binding_rejects_private_asset_order_under_constraint ... ok
+test asset_orchard_circuit::tests::pricing_claim_commitment_changes_on_epoch_or_packet_mismatch ... ok
+test asset_orchard_circuit::tests::private_egress_alpha_sampler_uses_fresh_randomness ... ok
+test asset_orchard_circuit::tests::private_egress_embedded_vk_artifact_loads_and_matches_release_pin ... ok
+test asset_orchard_circuit::tests::private_egress_full_shape_key_metadata_is_pinned_and_consistent ... ignored, full private-egress keygen is release-only benchmark-scale
+test asset_orchard_circuit::tests::private_egress_mock_prover_binds_note_to_public_exit_instance ... ignored, private egress note/Merkle/spend-authority MockProver is release-scale
+test asset_orchard_circuit::tests::private_egress_vk_artifact_tamper_fails_closed ... ok
+test asset_orchard_circuit::tests::private_egress_vk_env_overrides_are_ignored_without_dev_feature ... ok
+test asset_orchard_circuit::tests::private_egress_vk_release_pin_hashes_static_attestation ... ok
+test asset_orchard_circuit::tests::private_primary_issue_builder_proves_exact_output_and_verifies_both_proofs ... ignored, two full private-egress proofs are release-scale
+test asset_orchard_circuit::tests::private_primary_redeem_builder_proves_exact_output_and_verifies_both_proofs ... ignored, two full private-egress proofs are release-scale
+test asset_orchard_circuit::tests::private_primary_redeem_builder_rejects_wrong_input_asset_before_proving ... ok
+test asset_orchard_circuit::tests::replay_only_vk_artifacts_reconstruct_with_historical_circuit_shapes ... ok
+test asset_orchard_circuit::tests::shared_circuit_embedded_vk_artifacts_close_together ... ok
+test asset_orchard_circuit::tests::swap_builder_alpha_randomizes_rk_for_repeated_public_commitment ... ok
+test asset_orchard_circuit::tests::swap_circuit_recomputes_input_and_output_note_commitments ... ignored, full AssetOrchard note-commitment swap circuit is release-only benchmark-scale
+test asset_orchard_circuit::tests::swap_circuit_rejects_tampered_input_nullifier ... ignored, full AssetOrchard note-commitment swap circuit is release-only benchmark-scale
+test asset_orchard_circuit::tests::swap_circuit_rejects_tampered_output_note_commitment ... ignored, full AssetOrchard note-commitment swap circuit is release-only benchmark-scale
+test asset_orchard_circuit::tests::swap_circuit_rejects_tampered_randomized_verification_key ... ignored, full AssetOrchard note-commitment swap circuit is release-only benchmark-scale
+test asset_orchard_circuit::tests::swap_circuit_rejects_wrong_merkle_anchor ... ignored, full AssetOrchard note-commitment swap circuit is release-only benchmark-scale
+test asset_orchard_circuit::tests::swap_circuit_rejects_wrong_merkle_path ... ignored, full AssetOrchard note-commitment swap circuit is release-only benchmark-scale
+test asset_orchard_circuit::tests::swap_circuit_rejects_wrong_spend_authority_relation ... ignored, full AssetOrchard note-commitment swap circuit is release-only benchmark-scale
+test asset_orchard_circuit::tests::swap_consensus_verifier_accepts_real_proof_and_rejects_forged_nonconservation ... ignored, full AssetOrchard swap proof verification is release-only benchmark-scale
+test asset_orchard_circuit::tests::swap_embedded_vk_artifact_loads_and_matches_release_pin ... ok
+test asset_orchard_circuit::tests::swap_full_shape_key_metadata_is_pinned_and_consistent ... ignored, full AssetOrchard swap keygen is release-only benchmark-scale
+test asset_orchard_circuit::tests::swap_full_vk_rejects_missing_or_partial_note_witnesses ... ignored, full AssetOrchard swap proof verification is release-only benchmark-scale
+test asset_orchard_circuit::tests::swap_vk_artifact_tamper_fails_closed ... ok
+test asset_orchard_circuit::tests::swap_vk_artifact_wrong_schema_and_metadata_fail_closed ... ok
+test asset_orchard_circuit::tests::swap_vk_env_overrides_are_ignored_without_dev_feature ... ok
+test asset_orchard_circuit::tests::swap_vk_release_pin_hashes_static_attestation_not_debug_format ... ok
+test asset_orchard_circuit::tests::vk_artifacts_reject_cross_identity_and_replay_tampering ... ok
+test asset_orchard_circuit::tests::write_asset_orchard_k15_params_release_artifact ... ignored, K=15 parameter generation is release-only
+test asset_orchard_circuit::tests::zk_prover_baseline_benchmark ... ignored, full AssetOrchard swap proof verification is release-only benchmark-scale
+test asset_orchard_circuit::tests::zk_prover_cached_key_benchmark ... ignored, full AssetOrchard swap proof verification is release-only benchmark-scale
+test asset_orchard_note_encryption::tests::note_ciphertext_bytes_are_pinned ... ok
+test asset_orchard_note_encryption::tests::recipient_recovers_note_from_chain_ciphertext_without_note_file ... ok
+test asset_orchard_sinsemilla::tests::asset_note_commitment_domain_generators_are_non_identity ... ok
+test asset_orchard_sinsemilla::tests::asset_note_commitment_gadget_matches_host_commitment ... ignored, full asset-note Sinsemilla MockProver is release-only benchmark-scale
+test asset_orchard_sinsemilla::tests::asset_note_message_piece_packing_is_deterministic ... ok
+test asset_orchard_sinsemilla::tests::assigned_subpiece_accumulator_binds_piece_value ... ok
+test asset_orchard_sinsemilla::tests::assigned_subpiece_accumulator_rejects_wrong_piece_value ... ok
+test asset_orchard_sinsemilla::tests::assigned_subpiece_commitment_gadget_matches_host_commitment ... ignored, assigned-subpiece Sinsemilla MockProver is release-only benchmark-scale
+test tests::orchard_public_api_is_available ... ok
+test types::tests::action_validation_accepts_bounded_shape ... ok
+test types::tests::action_validation_rejects_mismatched_outputs ... ok
+test types::tests::blobs_serialize_as_hex_strings ... ok
+test types::tests::fixed_hex_wrappers_accept_expected_lengths ... ok
+test types::tests::fixed_hex_wrappers_reject_noncanonical_orchard_field_encodings ... ok
+test types::tests::fixed_hex_wrappers_reject_wrong_lengths_and_uppercase ... ok
+test types::tests::fixed_hex_wrappers_round_trip_upstream_orchard_types ... ok
+test types::tests::legacy_v1_profile_ids_are_rejected ... ok
+test types::tests::output_validation_rejects_wrong_ciphertext_lengths ... ok
+test types::tests::proof_bytes_are_bounded ... ok
+test verify::tests::authorizing_sighash_is_deterministic_and_domain_separated ... ok
+test verify::tests::context_rejects_zero_action_bound ... ok
+test verify::tests::legacy_vk_ids_are_archive_only_at_the_verifier_policy_boundary ... ok
+test verify::tests::orchard_anchor_from_commitments_matches_empty_anchor_and_changes_after_outputs ... ok
+test verify::tests::orchard_frontier_snapshot_incremental_root_matches_full_after_each_append ... ok
+test verify::tests::orchard_frontier_snapshot_rejects_malformed_cached_root ... ok
+test verify::tests::pricing_policy_is_provenance_neutral_and_fails_closed_on_band_epoch_packet ... ok
+test verify::tests::shielded_swap_builder_hides_private_witness_but_consensus_verifier_fails_closed ... ok
+test verify::tests::shielded_swap_builder_rejects_unauthorized_input ... ok
+test verify::tests::shielded_swap_builder_rejects_value_and_asset_non_conservation ... ok
+test verify::tests::shielded_swap_verifier_fails_closed_before_transcript_checks ... ok
+test asset_orchard_circuit::tests::conservation_core_real_halo2_proof_verifies_and_binds_instance ... ok
+test verify::zip32_secret_owner_tests::zip32_spending_key_bytes_match_upstream_derivation ... ok
+test verify::zip32_secret_owner_tests::zip32_spending_key_holder_debug_is_redacted ... ok
+test verify::zip32_secret_owner_tests::zip32_spending_key_rejects_hardened_account_index_before_derivation ... ok
+test verify::tests::verify_adapter_accepts_generated_output_bundle_and_rejects_wrong_domain has been running for over 60 seconds
+test verify::tests::verify_adapter_accepts_generated_output_bundle_and_rejects_wrong_domain ... ok
+
+test result: ok. 101 passed; 0 failed; 19 ignored; 0 measured; 0 filtered out; finished in 829.70s
+
+   Doc-tests postfiat_privacy_orchard
+
+running 1 test
+test crates/privacy_orchard/src/asset_orchard_circuit.rs - asset_orchard_circuit::AssetOrchardSwapConservationCircuit (line 543) - compile fail ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.03s
+
+(exit 0) # merge commit ab2150253 (PR #201 as merged) elapsed=1087s
+$ git checkout -q 5c8f693ca1d1603da1fde07cbcd82463b8ad92a7 && git rev-parse HEAD
+5c8f693ca1d1603da1fde07cbcd82463b8ad92a7
+(exit 0)
+$ sha256sum crates/privacy_orchard/src/asset_orchard_action_builders.rs crates/privacy_orchard/src/verify.rs crates/privacy_orchard/src/asset_orchard.rs Cargo.lock
+263ef64578056ef9f842a1d603bbadcbc95760dbd44463f7b02424064f9d254f  crates/privacy_orchard/src/asset_orchard_action_builders.rs
+f0f8f017cbf4b3b3d667008bac3a8be04122377cbf1ffa46662c4629678a086b  crates/privacy_orchard/src/verify.rs
+187a742085453f6dff6c3972626c79c8f9f8336e154118fd404e7bdd90acfa86  crates/privacy_orchard/src/asset_orchard.rs
+ea196895ad7aee3020cb9b9a6ad079aa1976abcff35a8c4710116d3e44a4e2a0  Cargo.lock
+(exit 0)
+$ docker run --rm --cpus 2 -v <clone>:/src -w /src rust:1.95.0-bookworm cargo test -p postfiat-privacy-orchard --locked   # origin/main 5c8f693ca1d1603da1fde07cbcd82463b8ad92a7 (after maintainer review fixes)
+info: syncing channel updates for 1.95.0-x86_64-unknown-linux-gnu
+info: latest update on 2026-04-16 for version 1.95.0 (59807616e 2026-04-14)
+info: downloading component clippy
+    Updating crates.io index
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 52s
+     Running unittests src/lib.rs (target/debug/deps/postfiat_privacy_orchard-438b27d74e6c1821)
+
+running 123 tests
+test asset_orchard::tests::asset_note_message_segments_reconstruct_host_message_bits ... ok
+test asset_orchard::tests::asset_nullifier_and_output_rho_are_domain_separated ... ok
+test asset_orchard::tests::asset_note_commitment_binds_pool_asset_value_and_points ... ok
+test asset_orchard::tests::asset_orchard_action_rejects_duplicate_public_state_fields ... ok
+test asset_orchard::tests::asset_orchard_action_rejects_tampered_binding_and_wrong_domain ... ok
+test asset_orchard::tests::asset_orchard_action_validates_and_constructs_public_instance ... ok
+test asset_orchard::tests::asset_orchard_indexing_helpers_reject_count_mismatch_without_panic ... ok
+test asset_orchard::tests::asset_orchard_wrappers_reject_noncanonical_encodings ... ok
+test asset_orchard::tests::asset_tag_uses_first_256_bits_and_rejects_noncanonical_text ... ok
+test asset_orchard::tests::asset_orchard_spend_authorizations_verify_and_bind_h_sig ... ok
+test asset_orchard::tests::disclosed_egress_randomizer_uses_fresh_randomness ... ok
+test asset_orchard::tests::encrypted_output_hash_returns_three_128_bit_limbs ... ok
+test asset_orchard::tests::fixed_lower_hex_array_keeps_error_codes_and_messages ... ok
+test asset_orchard::tests::h_action_and_swap_binding_hash_are_consistent ... ok
+test asset_orchard::tests::disclosed_egress_authorization_verifies_and_binds_recipient ... ok
+test asset_orchard::tests::hash_to_pallas_base_is_deterministic_and_domain_separated ... ok
+test asset_orchard::tests::hash_to_pallas_scalar_rejects_zero_by_construction ... ok
+test asset_orchard::tests::h_sig_binds_raw_ciphertext_and_binding_hash ... ok
+test asset_orchard::tests::note_opening_and_wallet_note_serde_wire_format_is_pinned ... ok
+test asset_orchard::tests::note_opening_and_wallet_note_debug_redact_custody_fields ... ok
+test asset_orchard::tests::orchard_psi_and_rcm_bind_rseed_and_rho ... ok
+test asset_orchard::tests::note_opening_zeroize_used_by_drop_clears_every_custody_field ... ok
+test asset_orchard::tests::pool_domain_binds_chain_genesis_protocol_pool_and_note_version ... ok
+test asset_orchard::tests::private_primary_issue_requires_exact_output_value_asset_and_domain ... ok
+test asset_orchard::tests::private_egress_action_serialization_does_not_disclose_note_opening ... ok
+test asset_orchard::tests::swap_accounting_serialization_hides_asset_identity ... ok
+test asset_orchard::tests::private_primary_redeem_schema_selects_settlement_output_semantics ... ok
+test asset_orchard_circuit::secret_lifetime_tests::secret_value_and_note_opening_have_their_own_wiping_drop ... ok
+test asset_orchard_circuit::secret_lifetime_tests::secret_value_wipes_curve_values_per_owner_and_redacts_debug ... ok
+test asset_orchard_circuit::secret_lifetime_tests::secret_value_wipes_each_owner_on_drop_and_error_exit ... ok
+test asset_orchard_circuit::secret_lifetime_tests::note_opening_zeroize_clears_every_field_and_spares_clones ... ok
+test asset_orchard_circuit::secret_lifetime_tests::spend_key_and_rivk_parse_errors_keep_codes_on_every_exit ... ok
+test asset_orchard_circuit::secret_lifetime_tests::swap_witness_and_spend_authority_debug_redact_secrets ... ok
+test asset_orchard_circuit::secret_lifetime_tests::swap_witness_holds_unchanged_values_in_self_wiping_owners ... ok
+test asset_orchard_circuit::secret_lifetime_tests::swap_builder_borrows_zeroizing_output_seeds_and_keeps_error_codes ... ok
+test asset_orchard_circuit::tests::conservation_core_accepts_pairwise_private_swap ... ok
+test asset_orchard_circuit::tests::conservation_core_accepts_single_nonzero_asset_tag_limb ... ok
+test asset_orchard_circuit::tests::conservation_core_accepts_uniform_private_swap_selectors ... ok
+test asset_orchard_circuit::tests::conservation_core_rejects_duplicate_public_nullifiers_and_outputs ... ok
+test asset_orchard_circuit::tests::conservation_core_rejects_forged_action_context ... ok
+test asset_orchard_circuit::tests::conservation_core_real_halo2_proof_verifies_and_binds_instance has been running for over 60 seconds
+test asset_orchard_circuit::tests::conservation_core_rejects_forged_nonconserving_swap ... ok
+test asset_orchard_circuit::tests::conservation_core_rejects_nonzero_fee_public_instance ... ok
+test asset_orchard_circuit::tests::conservation_core_rejects_split_private_swap_selectors ... ok
+test asset_orchard_circuit::tests::conservation_core_rejects_zero_asset_tag_witness ... ok
+test asset_orchard_circuit::tests::conservation_core_rejects_zero_value_witness ... ok
+test asset_orchard_circuit::tests::current_and_replay_vk_identities_are_distinct_and_exactly_pinned ... ok
+test asset_orchard_circuit::tests::embedded_k15_params_artifact_loads_exactly ... ok
+test asset_orchard_circuit::tests::k15_params_artifact_rejects_wrong_length_k_and_hash ... ok
+test asset_orchard_circuit::tests::pow5_chip_matches_reference_poseidon_for_randomized_action_vectors has been running for over 60 seconds
+test asset_orchard_circuit::tests::pow5_chip_matches_reference_poseidon_for_randomized_action_vectors ... ok
+test asset_orchard_circuit::tests::pricing_binding_accepts_deterministic_floor_rounding ... ok
+test asset_orchard_circuit::tests::pricing_binding_accepts_pfusdc_to_pnok_demo_fix_exactly ... ok
+test asset_orchard_circuit::tests::pricing_binding_rejects_forged_ratio_for_private_amounts ... ok
+test asset_orchard_circuit::tests::pricing_binding_rejects_non_floor_rounded_private_value ... ok
+test asset_orchard_circuit::tests::pricing_binding_rejects_one_atom_pnok_demo_fix_deviation ... ok
+test asset_orchard_circuit::tests::pricing_binding_rejects_private_asset_order_under_constraint ... ok
+test asset_orchard_circuit::tests::pricing_claim_commitment_changes_on_epoch_or_packet_mismatch ... ok
+test asset_orchard_circuit::tests::private_egress_alpha_sampler_uses_fresh_randomness ... ok
+test asset_orchard_circuit::tests::private_egress_embedded_vk_artifact_loads_and_matches_release_pin ... ok
+test asset_orchard_circuit::tests::private_egress_full_shape_key_metadata_is_pinned_and_consistent ... ignored, full private-egress keygen is release-only benchmark-scale
+test asset_orchard_circuit::tests::private_egress_mock_prover_binds_note_to_public_exit_instance ... ignored, private egress note/Merkle/spend-authority MockProver is release-scale
+test asset_orchard_circuit::tests::private_egress_vk_artifact_tamper_fails_closed ... ok
+test asset_orchard_circuit::tests::private_egress_vk_env_overrides_are_ignored_without_dev_feature ... ok
+test asset_orchard_circuit::tests::private_egress_vk_release_pin_hashes_static_attestation ... ok
+test asset_orchard_circuit::tests::private_primary_issue_builder_proves_exact_output_and_verifies_both_proofs ... ignored, two full private-egress proofs are release-scale
+test asset_orchard_circuit::tests::private_primary_redeem_builder_proves_exact_output_and_verifies_both_proofs ... ignored, two full private-egress proofs are release-scale
+test asset_orchard_circuit::tests::private_primary_redeem_builder_rejects_wrong_input_asset_before_proving ... ok
+test asset_orchard_circuit::tests::replay_only_vk_artifacts_reconstruct_with_historical_circuit_shapes ... ok
+test asset_orchard_circuit::tests::shared_circuit_embedded_vk_artifacts_close_together ... ok
+test asset_orchard_circuit::tests::swap_builder_alpha_randomizes_rk_for_repeated_public_commitment ... ok
+test asset_orchard_circuit::tests::swap_circuit_recomputes_input_and_output_note_commitments ... ignored, full AssetOrchard note-commitment swap circuit is release-only benchmark-scale
+test asset_orchard_circuit::tests::swap_circuit_rejects_tampered_input_nullifier ... ignored, full AssetOrchard note-commitment swap circuit is release-only benchmark-scale
+test asset_orchard_circuit::tests::swap_circuit_rejects_tampered_output_note_commitment ... ignored, full AssetOrchard note-commitment swap circuit is release-only benchmark-scale
+test asset_orchard_circuit::tests::swap_circuit_rejects_tampered_randomized_verification_key ... ignored, full AssetOrchard note-commitment swap circuit is release-only benchmark-scale
+test asset_orchard_circuit::tests::swap_circuit_rejects_wrong_merkle_anchor ... ignored, full AssetOrchard note-commitment swap circuit is release-only benchmark-scale
+test asset_orchard_circuit::tests::swap_circuit_rejects_wrong_merkle_path ... ignored, full AssetOrchard note-commitment swap circuit is release-only benchmark-scale
+test asset_orchard_circuit::tests::swap_circuit_rejects_wrong_spend_authority_relation ... ignored, full AssetOrchard note-commitment swap circuit is release-only benchmark-scale
+test asset_orchard_circuit::tests::swap_consensus_verifier_accepts_real_proof_and_rejects_forged_nonconservation ... ignored, full AssetOrchard swap proof verification is release-only benchmark-scale
+test asset_orchard_circuit::tests::swap_embedded_vk_artifact_loads_and_matches_release_pin ... ok
+test asset_orchard_circuit::tests::swap_full_shape_key_metadata_is_pinned_and_consistent ... ignored, full AssetOrchard swap keygen is release-only benchmark-scale
+test asset_orchard_circuit::tests::swap_full_vk_rejects_missing_or_partial_note_witnesses ... ignored, full AssetOrchard swap proof verification is release-only benchmark-scale
+test asset_orchard_circuit::tests::swap_vk_artifact_tamper_fails_closed ... ok
+test asset_orchard_circuit::tests::swap_vk_artifact_wrong_schema_and_metadata_fail_closed ... ok
+test asset_orchard_circuit::tests::swap_vk_env_overrides_are_ignored_without_dev_feature ... ok
+test asset_orchard_circuit::tests::swap_vk_release_pin_hashes_static_attestation_not_debug_format ... ok
+test asset_orchard_circuit::tests::vk_artifacts_reject_cross_identity_and_replay_tampering ... ok
+test asset_orchard_circuit::tests::write_asset_orchard_k15_params_release_artifact ... ignored, K=15 parameter generation is release-only
+test asset_orchard_circuit::tests::zk_prover_baseline_benchmark ... ignored, full AssetOrchard swap proof verification is release-only benchmark-scale
+test asset_orchard_circuit::tests::zk_prover_cached_key_benchmark ... ignored, full AssetOrchard swap proof verification is release-only benchmark-scale
+test asset_orchard_note_encryption::tests::note_ciphertext_bytes_are_pinned ... ok
+test asset_orchard_note_encryption::tests::recipient_recovers_note_from_chain_ciphertext_without_note_file ... ok
+test asset_orchard_sinsemilla::tests::asset_note_commitment_domain_generators_are_non_identity ... ok
+test asset_orchard_sinsemilla::tests::asset_note_commitment_gadget_matches_host_commitment ... ignored, full asset-note Sinsemilla MockProver is release-only benchmark-scale
+test asset_orchard_sinsemilla::tests::asset_note_message_piece_packing_is_deterministic ... ok
+test asset_orchard_sinsemilla::tests::assigned_subpiece_accumulator_binds_piece_value ... ok
+test asset_orchard_sinsemilla::tests::assigned_subpiece_accumulator_rejects_wrong_piece_value ... ok
+test asset_orchard_sinsemilla::tests::assigned_subpiece_commitment_gadget_matches_host_commitment ... ignored, assigned-subpiece Sinsemilla MockProver is release-only benchmark-scale
+test tests::orchard_public_api_is_available ... ok
+test types::tests::action_validation_accepts_bounded_shape ... ok
+test types::tests::action_validation_rejects_mismatched_outputs ... ok
+test types::tests::blobs_serialize_as_hex_strings ... ok
+test types::tests::fixed_hex_wrappers_accept_expected_lengths ... ok
+test types::tests::fixed_hex_wrappers_reject_noncanonical_orchard_field_encodings ... ok
+test types::tests::fixed_hex_wrappers_reject_wrong_lengths_and_uppercase ... ok
+test types::tests::fixed_hex_wrappers_round_trip_upstream_orchard_types ... ok
+test types::tests::legacy_v1_profile_ids_are_rejected ... ok
+test types::tests::output_validation_rejects_wrong_ciphertext_lengths ... ok
+test types::tests::proof_bytes_are_bounded ... ok
+test verify::tests::authorizing_sighash_is_deterministic_and_domain_separated ... ok
+test verify::tests::context_rejects_zero_action_bound ... ok
+test verify::tests::legacy_vk_ids_are_archive_only_at_the_verifier_policy_boundary ... ok
+test verify::tests::orchard_anchor_from_commitments_matches_empty_anchor_and_changes_after_outputs ... ok
+test verify::tests::orchard_frontier_snapshot_incremental_root_matches_full_after_each_append ... ok
+test verify::tests::orchard_frontier_snapshot_rejects_malformed_cached_root ... ok
+test verify::tests::pricing_policy_is_provenance_neutral_and_fails_closed_on_band_epoch_packet ... ok
+test verify::tests::shielded_swap_builder_hides_private_witness_but_consensus_verifier_fails_closed ... ok
+test verify::tests::shielded_swap_builder_rejects_unauthorized_input ... ok
+test verify::tests::shielded_swap_builder_rejects_value_and_asset_non_conservation ... ok
+test verify::tests::shielded_swap_verifier_fails_closed_before_transcript_checks ... ok
+test asset_orchard_circuit::tests::conservation_core_real_halo2_proof_verifies_and_binds_instance ... ok
+test verify::zip32_secret_owner_tests::zip32_spending_key_bytes_match_upstream_derivation ... ok
+test verify::zip32_secret_owner_tests::zip32_spending_key_holder_debug_is_redacted ... ok
+test verify::zip32_secret_owner_tests::zip32_spending_key_rejects_hardened_account_index_before_derivation ... ok
+test verify::tests::verify_adapter_accepts_generated_output_bundle_and_rejects_wrong_domain has been running for over 60 seconds
+test verify::tests::verify_adapter_accepts_generated_output_bundle_and_rejects_wrong_domain ... ok
+
+test result: ok. 104 passed; 0 failed; 19 ignored; 0 measured; 0 filtered out; finished in 766.67s
+
+   Doc-tests postfiat_privacy_orchard
+
+running 1 test
+test crates/privacy_orchard/src/asset_orchard_circuit.rs - asset_orchard_circuit::AssetOrchardSwapConservationCircuit (line 543) - compile fail ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.97s
+
+(exit 0) # origin/main 5c8f693ca1d1603da1fde07cbcd82463b8ad92a7 (after maintainer review fixes) elapsed=889s
+# end: 2026-11-10T11:14:25Z
+runner rc=0
